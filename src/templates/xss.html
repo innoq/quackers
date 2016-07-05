@@ -2,7 +2,7 @@
 {% block title %}XSS{% endblock %}
 {% block content %}
 <p>Input this text to perform an XSS attack!</p>
-<pre>&lt;script&gt;alert("I can do a lot of evil things!")&lt;/script&gt;</pre>
+<pre>&lt;script&gt;alert("I can do a lot of evil things!");&lt;/script&gt;</pre>
 <form method="post" action="/xss">
 	<input id="__anti-forgery-token" name="__anti-forgery-token" type="hidden" value="{{antiforgery}}" />
 	<fieldset class="form-group">

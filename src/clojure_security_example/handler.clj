@@ -13,15 +13,23 @@
      (render-file filename p))))
 
 (defn xss-attack [text]
-  (log/info "params" text)
-  (log/info (render "templates/xss.html" {:response text}))
+  (log/info "attempting xss: " text)
   (render "templates/xss.html" {:response text}))
 
-(defroutes app-routes
-  (GET "/" [] (render "templates/index.html"))
-  (GET "/xss" [] (render "templates/xss.html")) 
-  (POST "/xss" [text] (xss-attack text))
-  (route/not-found "Not Found!"))
+(defroutes index
+  (GET "/" [] (render "templates/index.html")))  
+
+(defn xss-routes [path]
+  (routes
+    (GET path [] (render "templates/xss.html")) 
+    (POST path [text] (xss-attack text))))
+               
+(defn app-routes []
+  (routes
+    index
+    (xss-routes "/xss")
+    (route/not-found "Not Found!")))
+
 
 (def middleware-settings
   {:params    {:urlencoded true
@@ -42,4 +50,4 @@
                :default-charset        "utf-8"}})
 
 (def app
-  (wrap-defaults app-routes middleware-settings)) 
+  (wrap-defaults (app-routes) middleware-settings)) 
