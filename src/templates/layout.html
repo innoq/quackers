@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{% block title %}Title{% endblock %}</title>
+	{% style "/css/bootstrap.min.css" %}
+</head>
+<body>
+	<div class="container">
+		{% block content %}The Content{% endblock %}
+	</div>
+</body>
+</html>

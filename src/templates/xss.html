@@ -1,0 +1,20 @@
+{% extends "templates/layout.html" %}
+{% block title %}XSS{% endblock %}
+{% block content %}
+<p>Input this text to perform an XSS attack!</p>
+<pre>&lt;script&gt;alert("I can do a lot of evil things!")&lt;/script&gt;</pre>
+<form method="post" action="/xss">
+	<input id="__anti-forgery-token" name="__anti-forgery-token" type="hidden" value="{{antiforgery}}" />
+	<fieldset class="form-group">
+		<label for="inputfield">Input some text</label>
+		<input type="text" class="form-control" id="text" name="text" placeholder="Type Here" />
+	</fieldset>
+	<input type="submit" class="form-control" />
+</form>
+{% if response %}
+	<p>What is rendered without HTML escaping:</p>
+	{{response|safe}}
+	<p>What should be rendered:</p>
+	{{response}}
+{% endif %}
+{% endblock %}
