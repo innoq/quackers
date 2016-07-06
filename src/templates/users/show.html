@@ -1,0 +1,10 @@
+{% extends "templates/layout.html" %}
+{% block title %}Show User {{username}}{% endblock %}
+{% block content %}
+<dl>
+	<dt>Username:</dt>
+	<dd>{{username}}</dd>
+	<dt>Email:</dt>
+	<dd>{{email}}</dd>
+</dl>
+{% endblock %}

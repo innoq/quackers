@@ -1,0 +1,30 @@
+{% extends "templates/layout.html" %}
+{% block title %}Create User{% endblock %}
+{% block content %}
+{% if errors %}
+<div class="alert alert-danger" role="alert">
+	<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+	</button>
+	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+	<span class="sr-only">Error:</span>
+	Make sure your input fields are correct!
+</div>
+{% endif %}
+<form method="post" action="/users">
+	<input id="__anti-forgery-token" name="__anti-forgery-token" type="hidden" value="{{antiforgery}}" />
+	<fieldset class="form-group {% if username-invalid %}has-error{% endif %}">
+		<label for="username">Username:</label>
+		<input type="text" class="form-control" id="username" name="username" value="{{username}}"/>
+	</fieldset>
+	<fieldset class="form-group {% if email-invalid %}has-error{% endif %}">
+		<label for="email">Email:</label>
+		<input type="text" class="form-control" id="email" name="email" value="{{email}}" />
+	</fieldset>
+	<fieldset class="form-group {% if password-invalid %}has-error{% endif %}">
+		<label for="password">Password:</label>
+		<input type="password" class="form-control" id="password" name="password" value="{{password}}" />
+	</fieldset>
+	<input type="submit" class="form-control" />
+</form>
+{% endblock %}

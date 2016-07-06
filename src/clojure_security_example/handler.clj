@@ -1,9 +1,12 @@
 (ns clojure-security-example.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
-            [ring.middleware.defaults :refer [wrap-defaults]]
+            [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
+            [ring.middleware.session.cookie :refer [cookie-store]]
             [clojure-security-example.helpers :as h]
-            [clojure-security-example.xss :refer [xss-routes]]))
+            [clojure-security-example.xss :refer [xss-routes]]
+            [clojure-security-example.users :refer [user-routes]]
+            [clojure.tools.logging :as log]))
 
 (defroutes index
   (GET "/" [] (h/render "templates/index.html")))  
@@ -12,25 +15,37 @@
   (routes
     index
     (xss-routes "/xss")
+    (user-routes "/users")
     (route/not-found "Not Found!")))
 
-(def middleware-settings
-  {:params    {:urlencoded true
-               :multipart  true
-               :nested     true
-               :keywordize true}
-   :cookies   true
-   :session   {:flash true
-               :cookie-attrs {:http-only true}}
-   :security  {:anti-forgery   true
-               :xss-protection {:enable? false, :mode :block} ;; in site-defaults this is true.
-               :frame-options  :sameorigin
-               :content-type-options :nosniff}
-   :static    {:resources "public"}
-   :responses {:not-modified-responses true
-               :absolute-redirects     true
-               :content-types          true
-               :default-charset        "utf-8"}})
+(defn ignore-trailing-slash
+  "Modifies the request uri before calling the handler.
+  Removes a single trailing slash from the end of the uri if present.
+
+  Useful for handling optional trailing slashes until Compojure's route matching syntax supports regex.
+  Adapted from http://stackoverflow.com/questions/8380468/compojure-regex-for-matching-a-trailing-slash"
+  [handler]
+  (fn [request]
+    (let [uri (:uri request)]
+      (handler (assoc request :uri (if (and (not (= "/" uri))
+                                            (.endsWith uri "/"))
+                                     (subs uri 0 (dec (count uri)))
+                                     uri))))))
+
+(defn logging-middleware [handler]
+  (fn [request] 
+    (log/info :request request)
+    (let [response (handler request)]
+      response)))
+
+
+(defn middleware-settings []
+  (-> site-defaults
+      (assoc-in [:session :store] (cookie-store {:key "I'm a 16-bit key"}))
+      (assoc-in [:security :xss-protection :enable?] false))) ;; normally do not change. For this app, we want to show what XSS looks like, so we need to 'enable' it.
 
 (def app
-  (wrap-defaults (app-routes) middleware-settings)) 
+  (-> (app-routes)
+      ignore-trailing-slash
+      ;logging-middleware
+      (wrap-defaults (middleware-settings)))) 
