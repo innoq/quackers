@@ -1,6 +1,7 @@
 # clojure-security-example
 
-FIXME
+An example application demonstrating security weaknesses and offering 
+solutions on how to fix them.
 
 ## Prerequisites
 
