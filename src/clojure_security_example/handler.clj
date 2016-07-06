@@ -2,34 +2,17 @@
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults]]
-            [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
-            [clojure.tools.logging :as log]
-            [selmer.parser :refer [render-file]]))
-
-(defn render 
-  ([filename] (render filename {}))
-  ([filename params]
-   (let [p (assoc params :antiforgery *anti-forgery-token*)]
-     (render-file filename p))))
-
-(defn xss-attack [text]
-  (log/info "attempting xss: " text)
-  (render "templates/xss.html" {:response text}))
+            [clojure-security-example.helpers :as h]
+            [clojure-security-example.xss :refer [xss-routes]]))
 
 (defroutes index
-  (GET "/" [] (render "templates/index.html")))  
-
-(defn xss-routes [path]
-  (routes
-    (GET path [] (render "templates/xss.html")) 
-    (POST path [text] (xss-attack text))))
+  (GET "/" [] (h/render "templates/index.html")))  
                
 (defn app-routes []
   (routes
     index
     (xss-routes "/xss")
     (route/not-found "Not Found!")))
-
 
 (def middleware-settings
   {:params    {:urlencoded true
