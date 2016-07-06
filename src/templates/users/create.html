@@ -9,6 +9,9 @@
 	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 	<span class="sr-only">Error:</span>
 	Make sure your input fields are correct!
+	{% if already-exists %}
+	The username '{{username}}' is already taken!
+	{% endif %}
 </div>
 {% endif %}
 <form method="post" action="/users">

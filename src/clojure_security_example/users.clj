@@ -10,7 +10,7 @@
 
 (def db-spec {:connection-uri (env :database-url)})
 
-;; Imports the functions get-users, get-user, add-user!, update-user!, delete-user!
+;; Imports the functions get-users, get-user, add-user!, update-user-email!, update-user-password!, delete-user!
 (defqueries "db/users.sql" {:connection db-spec})
 
 (defn create-user! [usermap]
@@ -20,43 +20,53 @@
     (add-user! newmap)
     newmap))
 
+(defn update-password! [usermap]
+  (when-let [password (:password usermap)]
+    (let [digest   (hashers/encrypt password)
+          newmap   (assoc usermap :password digest)]
+      (update-user-password! newmap)
+      newmap)))
+
 (def email-regex #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")
 (s/def ::email (s/and string? (s/or :valid? #(re-matches email-regex %) :empty? empty?)))
-(s/def ::username (s/and string? #(not (empty? %)) #(not (first (get-user {:username %})))))
+(s/def ::username (s/and string? #(not (empty? %))))
 (s/def ::password  (s/and string? #(not (empty? %))))
 
 (s/def :unq/user-create
   (s/keys :req-un [::username ::password]
           :opt-un [::email]))
 
-(defn contains-key? [usermap keyword]
+(s/def :unq/user-update
+  (s/keys :req-un [::username]
+          :opt-un [::email ::password]))
+
+(defn missing-key? [usermap keyword]
   (let [value (get usermap keyword)]
     (or (empty? value) (nil? value))))
   
-
-(defn add-information [usermap]
-  (let [data (s/explain-data :unq/user-create usermap)
+(defn add-information [usermap validator required-keys]
+  (let [data (s/explain-data validator usermap)
         _    (log/info :validation data)
         invalid (mapcat :in (second (first data)) data)
-        missing (filter (partial contains-key? usermap) [:username :password])
+        missing (filter (partial missing-key? usermap) required-keys)
         all  (distinct (concat invalid missing))
-        _    (log/info :all)
         invalid-map (into {} (map (fn [k] [(keyword (str (name k) "-invalid")) true]) all))
         result (assoc (merge usermap invalid-map) :errors true)]
     (log/info :result result)
     result))
     
-
 (defn create-form [user]
   (h/render "templates/users/create.html" user))
 
 (defn create-user [user basepath]
   (log/info :create (dissoc user :password))
   (let [valid-user (s/conform :unq/user-create user)]
-    (if (= valid-user :clojure.spec/invalid)
-      (create-form (add-information user))
-      (let [new-user (create-user! user)]
-           (redirect basepath)))))
+    (if (= valid-user :clojure.spec/invalid) 
+      (create-form (add-information user :unq/user-create [:username :password]))
+      (if (first (get-user user))
+        (create-form (assoc user :errors true :already-exists true))
+        (let [new-user (create-user! user)]
+           (redirect basepath))))))
       
 (defn list []
   (let [users (get-users)]
@@ -86,9 +96,14 @@
     (if user (edit-form (dissoc user :password)))))  
 
 (defn update [user basepath]
-  (log/info :update user)
-  ;; TODO!
-  (redirect basepath))
+  (log/info :update (dissoc user :password))
+  (let [to-validate (if (empty? (:password user)) (dissoc user :password) user)
+        valid-user (s/conform :unq/user-update to-validate)]
+    (if (= valid-user :clojure.spec/invalid)
+        (edit-form (add-information to-validate :unq/user-update []))
+        (let [_ (update-password! to-validate)
+              _ (update-user-email! to-validate)]
+             (redirect basepath)))))
 
 (defn user-routes [path]
   (routes
