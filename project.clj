@@ -5,12 +5,12 @@
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
   :min-lein-version "2.0.0"
   :dependencies [[org.clojure/clojure "1.7.0"]
-                 [compojure "1.4.0"]
-                 [ring/ring-defaults "0.1.5"]
+                 [compojure "1.5.1"]
+                 [ring/ring-defaults "0.2.1"]
                  [selmer "1.0.7"]
                  [org.clojure/tools.logging "0.3.1"]
                  [ragtime "0.6.1"]
-                 [environ "1.0.2"]
+                 [environ "1.0.3"]
                  [com.h2database/h2 "1.4.192"]]
   :plugins [[lein-ring "0.9.7"]
             [lein-environ "1.0.2"]]
