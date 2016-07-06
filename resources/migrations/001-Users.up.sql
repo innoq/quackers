@@ -1,0 +1,1 @@
+CREATE TABLE Users (Username varchar(255), Email varchar(255), Password BINARY(60), PRIMARY KEY (Username));
