@@ -3,6 +3,7 @@
             [ring.util.request :refer [request-url]]
             [selmer.parser :refer [render-file]]
             [clojure.tools.logging :as log]
+            [environ.core :refer [env]]
             [clojure.spec :as s]))
 
 (defn render 
@@ -18,3 +19,12 @@
 (def email-spec (s/and string? (s/or :valid? #(re-matches email-regex %) :empty? empty?)))
 (def username-spec (s/and string? #(not (empty? %))))
 (def password-spec (s/and string? #(not (empty? %))))
+
+(defn http-port []
+  (Integer/parseInt (or (env :http-port) "3000")))
+
+(defn ssl-port []
+  (Integer/parseInt (or (env :ssl-port) "4000")))
+
+(defn host []
+  (or (env :host) "localhost"))

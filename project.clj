@@ -17,9 +17,6 @@
                  [com.h2database/h2 "1.4.192"]]
   :plugins [[lein-environ "1.0.3"]]
   :main clojure-security-example.server
-  :profiles {:dev {:dependencies [[javax.servlet/servlet-api "2.5"]
-                                  [ring/ring-mock "0.3.0"]] 
-                   :env {:database-url "jdbc:h2:./db/app"}}}
   :aliases {"migrate" ["run" "-m" "db.migrate/migrate"]
             "rollback" ["run" "-m" "db.migrate/rollback"]})
        

@@ -2,16 +2,17 @@
   (:require [db.migrate :as db]
             [environ.core :refer [env]]
             [ring.adapter.jetty :refer [run-jetty]]
+            [clojure-security-example.helpers :as h]
             [clojure-security-example.handler :as handler]))
-
-(defn- port []
-  (Integer/parseInt (or (env :port) "3000")))
-
-(defn host []
-  (or (env :host) (str "http://localhost" (port))))
 
 (defn -main [& args]
   (db/migrate)
   (run-jetty
     handler/app
-    {:port (port)}))
+    {:port (h/http-port)
+     :join? false
+     :ssl? true
+     :ssl-port (h/ssl-port)
+     :keystore (:keystore env)
+     :key-password (:key-password env)
+     :host (h/host)}))
