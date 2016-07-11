@@ -1,6 +1,10 @@
 (ns clojure-security-example.authentication
-  :requires [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
-            [compojure.core :refer :all])
+  (:require [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
+            [compojure.core :refer :all]
+            [ring.util.response :refer [redirect]]
+            [buddy.auth.protocols :as proto]
+            [buddy.sign.jws :as jws]
+            [buddy.auth :refer [authenticated? throw-unauthorized]]))
   
 
 (def secret "myveryverysecretsecret")
@@ -29,4 +33,6 @@
           (wrap-authentication backend)
           (wrap-authorization backend)))))
           
-    
+(defn auth-routes []
+  (routes
+    (GET "/login" [] (redirect "/"))))
