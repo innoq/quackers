@@ -35,10 +35,9 @@
       (update-user-password! newmap)
       newmap)))
 
-(def email-regex #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")
-(s/def ::email (s/and string? (s/or :valid? #(re-matches email-regex %) :empty? empty?)))
-(s/def ::username (s/and string? #(not (empty? %))))
-(s/def ::password  (s/and string? #(not (empty? %))))
+(s/def ::email h/email-spec)
+(s/def ::username h/username-spec)
+(s/def ::password h/password-spec)
 
 (s/def :unq/user-create
   (s/keys :req-un [::username ::password]
@@ -63,30 +62,29 @@
     (log/info :result result)
     result))
     
-(defn create-form [user]
-  (h/render "templates/users/create.html" user))
+(defn create-form [request user]
+  (h/render request "templates/users/create.html" user))
 
-(defn create-user [user]
+(defn create-user [request user]
   (log/info :create (dissoc user :password))
   (let [valid-user (s/conform :unq/user-create user)]
     (if (= valid-user :clojure.spec/invalid) 
-      (create-form (add-information user :unq/user-create [:username :password]))
+      (create-form request (add-information user :unq/user-create [:username :password]))
       (if (first (get-user user))
-        (create-form (assoc user :errors true :already-exists true))
+        (create-form request (assoc user :errors true :already-exists true))
         (let [new-user (create-user! user)]
            (redirect (:index route-map)))))))
       
-(defn list []
+(defn index [request]
   (let [users (get-users)]
-    (h/render "templates/users/index.html" {:users users})))
+    (h/render request "templates/users/index.html" {:users users})))
 
-(defn show [username]
+(defn show [request username]
   (log/info :show username)
   ;; TODO validate
   (let [user (first (get-user {:username username}))]
     (log/info user)
-    ;; TODO 404
-    (if user (h/render "templates/users/show.html" user))))
+    (if user (h/render request "templates/users/show.html" user))))
 
 (defn delete [username]
   (log/info :delete username)
@@ -94,31 +92,30 @@
   (let [_ (delete-user! {:username username})]
     (redirect (:index route-map))))
 
-(defn edit-form [user]
-  (h/render "templates/users/edit.html" user))
+(defn edit-form [request user]
+  (h/render request "templates/users/edit.html" user))
 
-(defn edit [username]
+(defn edit [request username]
   (log/info :edit username)
   (let [user (first (get-user {:username username}))]
-    ;; TODO 404
-    (if user (edit-form (dissoc user :password)))))  
+    (if user (edit-form request (dissoc user :password)))))  
 
-(defn update [user]
+(defn update [request user]
   (log/info :update (dissoc user :password))
   (let [to-validate (if (empty? (:password user)) (dissoc user :password) user)
         valid-user (s/conform :unq/user-update to-validate)]
     (if (= valid-user :clojure.spec/invalid)
-        (edit-form (add-information to-validate :unq/user-update []))
+        (edit-form request (add-information to-validate :unq/user-update []))
         (let [_ (update-password! to-validate)
               _ (update-user-email! to-validate)]
              (redirect (:index route-map))))))          
 
 (defn user-routes []
   (routes
-    (GET    (:index route-map) [] (list))
-    (GET    (:new route-map)   [] (create-form {}))
-    (POST   (:index route-map) {params :params} (create-user params))
-    (GET    (:show route-map)  [username] (show username))
-    (GET    (:edit route-map)  [username] (edit username))
-    (PUT    (:show route-map)  [username email password] (update {:username username :email email :password password}))
+    (GET    (:index route-map) request (index request))
+    (GET    (:new route-map)   request (create-form request {}))
+    (POST   (:index route-map) {params :params :as request} (create-user request params))
+    (GET    (:show route-map)  [username :as request] (show request username))
+    (GET    (:edit route-map)  [username :as request] (edit request username))
+    (PUT    (:show route-map)  [username email password :as request] (update request {:username username :email email :password password}))
     (DELETE (:show route-map)  [username] (delete username))))

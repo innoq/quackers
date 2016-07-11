@@ -10,7 +10,7 @@
             [clojure.tools.logging :as log]))
 
 (defroutes index
-  (GET "/" [] (h/render "templates/index.html")))  
+  (GET "/" request (h/render request "templates/index.html")))  
                
 (defn app-routes []
   (routes
@@ -43,7 +43,7 @@
 
 (defn middleware-settings []
   (-> site-defaults
-      (assoc-in [:session :store] (cookie-store {:key "I'm a 16-bit key"}))
+    ;  (assoc-in [:session :store] (cookie-store {:key "I'm a 16-bit key"}))
       (assoc-in [:security :xss-protection :enable?] false))) ;; normally do not change. For this app, we want to show what XSS looks like, so we need to 'enable' it.
 
 (def app

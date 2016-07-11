@@ -6,10 +6,20 @@
 	{% style "/css/bootstrap.min.css" %}
 </head>
 <body>
-	<nav class="navbar navbar-default navbar-fixed-top">
-		 <div class="navbar-header">
-		 	<a href="/login">Login</a>
-		 </div>
+	<nav class="navbar navbar-default navbar-static-top">
+		<div class="container">
+			 <div class="navbar-header pull-right">
+			 	<form class="navbar-form" method="post" action="/login">
+			 	  <input id="__anti-forgery-token" name="__anti-forgery-token" type="hidden" value="{{antiforgery}}" />
+				  <div class="form-group">
+				    <input type="text" class="form-control" name="username" placeholder="Username" />
+				    <input type="password" class="form-control" name="password" placeholder="Password" />
+				    <input type="hidden" name="redirect-to" value="{{redirect-url}}" />
+				  </div>
+				  <button type="submit" class="btn btn-default">Login</button>
+				</form>
+			 </div>
+		</div>
 	</nav>
 	<div class="container">
 		{% block content %}The Content{% endblock %}
