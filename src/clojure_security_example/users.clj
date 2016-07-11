@@ -8,6 +8,14 @@
             [clojure.spec :as s]
             [buddy.hashers :as hashers]))
 
+(def route-map
+  (let [basepath "/users"
+        show     (str basepath "/:username")]
+    {:index basepath
+     :new   (str basepath "/new")
+     :show  show
+     :edit  (str show "/edit")})) 
+
 (def db-spec {:connection-uri (env :database-url)})
 
 ;; Imports the functions get-users, get-user, add-user!, update-user-email!, update-user-password!, delete-user!
@@ -58,7 +66,7 @@
 (defn create-form [user]
   (h/render "templates/users/create.html" user))
 
-(defn create-user [user basepath]
+(defn create-user [user]
   (log/info :create (dissoc user :password))
   (let [valid-user (s/conform :unq/user-create user)]
     (if (= valid-user :clojure.spec/invalid) 
@@ -66,7 +74,7 @@
       (if (first (get-user user))
         (create-form (assoc user :errors true :already-exists true))
         (let [new-user (create-user! user)]
-           (redirect basepath))))))
+           (redirect (:index route-map)))))))
       
 (defn list []
   (let [users (get-users)]
@@ -80,11 +88,11 @@
     ;; TODO 404
     (if user (h/render "templates/users/show.html" user))))
 
-(defn delete [username basepath]
+(defn delete [username]
   (log/info :delete username)
   ;; TODO validate
   (let [_ (delete-user! {:username username})]
-    (redirect basepath)))
+    (redirect (:index route-map))))
 
 (defn edit-form [user]
   (h/render "templates/users/edit.html" user))
@@ -95,7 +103,7 @@
     ;; TODO 404
     (if user (edit-form (dissoc user :password)))))  
 
-(defn update [user basepath]
+(defn update [user]
   (log/info :update (dissoc user :password))
   (let [to-validate (if (empty? (:password user)) (dissoc user :password) user)
         valid-user (s/conform :unq/user-update to-validate)]
@@ -103,14 +111,14 @@
         (edit-form (add-information to-validate :unq/user-update []))
         (let [_ (update-password! to-validate)
               _ (update-user-email! to-validate)]
-             (redirect basepath)))))
+             (redirect (:index route-map))))))          
 
-(defn user-routes [path]
+(defn user-routes []
   (routes
-    (GET path [] (list))
-    (GET (str path "/new") [] (create-form {}))
-    (POST path {params :params} (create-user params path))
-    (GET (str path "/:username") [username] (show username))
-    (GET (str path "/:username/edit") [username] (edit username))
-    (PUT (str path "/:username") [username email password] (update {:username username :email email :password password} path))
-    (DELETE (str path "/:username") [username] (delete username path))))
+    (GET    (:index route-map) [] (list))
+    (GET    (:new route-map)   [] (create-form {}))
+    (POST   (:index route-map) {params :params} (create-user params))
+    (GET    (:show route-map)  [username] (show username))
+    (GET    (:edit route-map)  [username] (edit username))
+    (PUT    (:show route-map)  [username email password] (update {:username username :email email :password password}))
+    (DELETE (:show route-map)  [username] (delete username))))
