@@ -6,6 +6,7 @@
             [clojure-security-example.helpers :as h]
             [clojure-security-example.xss :refer [xss-routes]]
             [clojure-security-example.users :refer [user-routes]]
+            [clojure-security-example.authentication :refer [auth-routes]]
             [clojure.tools.logging :as log]))
 
 (defroutes index
@@ -14,8 +15,9 @@
 (defn app-routes []
   (routes
     index
+    (auth-routes)
     (xss-routes "/xss")
-    (user-routes "/users")
+    (user-routes) ;; creates routes at /users endpoint
     (route/not-found "Not Found!")))
 
 (defn ignore-trailing-slash
@@ -34,7 +36,7 @@
 
 (defn logging-middleware [handler]
   (fn [request] 
-    (log/info :request request)
+    (log/info :headers (:headers request))
     (let [response (handler request)]
       response)))
 
@@ -47,5 +49,5 @@
 (def app
   (-> (app-routes)
       ignore-trailing-slash
-      ;logging-middleware
+      logging-middleware
       (wrap-defaults (middleware-settings)))) 

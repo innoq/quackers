@@ -1,0 +1,17 @@
+{% extends "templates/layout.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<p>Please log in!</p>
+<form method="post" action="/login">
+	<input id="__anti-forgery-token" name="__anti-forgery-token" type="hidden" value="{{antiforgery}}" />
+	<fieldset class="form-group {% if username-invalid %}has-error{% endif %}">
+		<label for="username">Username:</label>
+		<input type="text" class="form-control" id="username" name="username" value="{{username}}"/>
+	</fieldset>
+	<fieldset class="form-group {% if password-invalid %}has-error{% endif %}">
+		<label for="password">Password:</label>
+		<input type="password" class="form-control" id="password" name="password" value="{{password}}" />
+	</fieldset>
+	<input type="submit" class="form-control" />
+</form>
+{% endblock %}
