@@ -5,7 +5,6 @@
             [buddy.auth.protocols :as proto]
             [buddy.sign.jws :as jws]
             [buddy.auth :refer [authenticated? throw-unauthorized]]))
-  
 
 (def secret "myveryverysecretsecret")
 
@@ -35,4 +34,4 @@
           
 (defn auth-routes []
   (routes
-    (GET "/login" [] (redirect "/"))))
+    (POST "/login" [username password] (redirect "/"))))
