@@ -21,7 +21,7 @@
 		</td>
 		<td>
 			<form action="/users/{{user.username}}" method="POST">
-				<input id="__anti-forgery-token" name="__anti-forgery-token" type="hidden" value="{{antiforgery}}" />
+				{% antiforgery %}
 				<input name="_method" value="DELETE" type="hidden" />
 				<button type="submit" class="btn btn-default" aria-label="Delete">
 					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>

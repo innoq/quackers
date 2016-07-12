@@ -1,17 +1,22 @@
 (ns clojure-security-example.helpers 
   (:require [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
             [ring.util.request :refer [request-url]]
-            [selmer.parser :refer [render-file]]
+            [selmer.parser :refer [render-file] :as selmer]
             [clojure.tools.logging :as log]
             [environ.core :refer [env]]
             [clojure.spec :as s]))
+
+(selmer/add-tag! :antiforgery
+                 (fn [args context-map]
+                   (let [input (render-file "templates/anti-forgery.html" {:antiforgery *anti-forgery-token*})]
+                     (log/info :html input)
+                     input)))
 
 (defn render 
   ([request filename] (render request filename {}))
   ([request filename params]
    (let [redirect (request-url request)
-         p (assoc params :antiforgery *anti-forgery-token*
-                         :redirect-url redirect)]
+         p (assoc params :redirect-url redirect)]
      (log/info :uri redirect)
      (render-file filename p))))
 
