@@ -7,17 +7,14 @@
             [clojure.spec :as s]))
 
 (selmer/add-tag! :antiforgery
-                 (fn [args context-map]
-                   (let [input (render-file "templates/anti-forgery.html" {:antiforgery *anti-forgery-token*})]
-                     (log/info :html input)
-                     input)))
+                 (fn [_ _]
+                   (render-file "templates/anti-forgery.html" {:antiforgery *anti-forgery-token*})))
 
 (defn render 
   ([request filename] (render request filename {}))
   ([request filename params]
    (let [redirect (request-url request)
          p (assoc params :redirect-url redirect)]
-     (log/info :uri redirect)
      (render-file filename p))))
 
 (def email-regex #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")

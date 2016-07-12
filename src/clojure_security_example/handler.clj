@@ -49,5 +49,5 @@
 (def app
   (-> (app-routes)
       ignore-trailing-slash
-      logging-middleware
+     ; logging-middleware
       (wrap-defaults (middleware-settings)))) 
