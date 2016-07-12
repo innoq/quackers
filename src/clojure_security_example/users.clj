@@ -67,13 +67,12 @@
 
 (defn create-user [request user]
   (log/info :create (dissoc user :password))
-  (let [valid-user (s/conform :unq/user-create user)]
-    (if (= valid-user :clojure.spec/invalid) 
-      (create-form request (add-information user :unq/user-create [:username :password]))
-      (if (first (get-user user))
-        (create-form request (assoc user :errors true :already-exists true))
-        (let [new-user (create-user! user)]
-           (redirect (:index route-map)))))))
+  (if-not (s/valid? :unq/user-create user)
+    (create-form request (add-information user :unq/user-create [:username :password]))
+    (if (first (get-user user))
+      (create-form request (assoc user :errors true :already-exists true))
+      (let [new-user (create-user! user)]
+         (redirect (:index route-map))))))
       
 (defn index [request]
   (let [users (get-users)]
@@ -81,16 +80,15 @@
 
 (defn show [request username]
   (log/info :show username)
-  ;; TODO validate
-  (let [user (first (get-user {:username username}))]
-    (log/info user)
-    (if user (h/render request "templates/users/show.html" user))))
+  (when (s/valid? ::username username)
+    (let [user (first (get-user {:username username}))]
+      (when user (h/render request "templates/users/show.html" user)))))
 
 (defn delete [username]
   (log/info :delete username)
-  ;; TODO validate
-  (let [_ (delete-user! {:username username})]
-    (redirect (:index route-map))))
+  (when (s/valid? ::username username)
+    (let [_ (delete-user! {:username username})]
+      (redirect (:index route-map)))))
 
 (defn edit-form [request user]
   (h/render request "templates/users/edit.html" user))
@@ -102,13 +100,12 @@
 
 (defn update [request user]
   (log/info :update (dissoc user :password))
-  (let [to-validate (if (empty? (:password user)) (dissoc user :password) user)
-        valid-user (s/conform :unq/user-update to-validate)]
-    (if (= valid-user :clojure.spec/invalid)
-        (edit-form request (add-information to-validate :unq/user-update []))
-        (let [_ (update-password! to-validate)
-              _ (update-user-email! to-validate)]
-             (redirect (:index route-map))))))          
+  (let [to-validate (if (empty? (:password user)) (dissoc user :password) user)]
+    (if-not (s/valid? :unq/user-update to-validate)
+      (edit-form request (add-information to-validate :unq/user-update []))
+      (let [_ (update-password! to-validate)
+            _ (update-user-email! to-validate)]
+           (redirect (:index route-map))))))          
 
 (defn user-routes []
   (routes
