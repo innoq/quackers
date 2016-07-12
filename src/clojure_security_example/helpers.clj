@@ -30,3 +30,7 @@
 
 (defn host []
   (or (env :host) "localhost"))
+
+(defn bad-request [] {:status 400 :headers {} :body "Bad Request"})
+(defn unauthorized [] {:status 401 :headers {} :body "Unauthorized"})
+(defn permission-denied [] {:status 403 :headers {} :body "Permission Denied"})

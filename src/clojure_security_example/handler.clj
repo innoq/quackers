@@ -36,7 +36,7 @@
 
 (defn logging-middleware [handler]
   (fn [request] 
-    (log/info :headers (:headers request))
+    (when (:identity request) (log/info :identity (:identity request)))
     (let [response (handler request)]
       response)))
 

@@ -1,9 +1,8 @@
 (ns clojure-security-example.users
   (:require [compojure.core :refer :all]
-            [environ.core :refer [env]]
             [clojure-security-example.helpers :as h]
             [clojure.tools.logging :as log]
-            [yesql.core :refer [defqueries]]
+            [clojure-security-example.database :as db]
             [ring.util.response :refer [redirect]]
             [clojure.spec :as s]
             [buddy.hashers :as hashers]))
@@ -16,23 +15,25 @@
      :show  show
      :edit  (str show "/edit")})) 
 
-(def db-spec {:connection-uri (env :database-url)})
-
-;; Imports the functions get-users, get-user, add-user!, update-user-email!, update-user-password!, delete-user!
-(defqueries "db/users.sql" {:connection db-spec})
-
 (defn create-user! [usermap]
   (let [password (:password usermap)
         digest   (hashers/encrypt password)
         newmap   (assoc usermap :password digest)]
-    (add-user! newmap)
+    (db/add-user! newmap)
+    newmap))
+
+(defn update-password! [usermap]
+  (let [password (:password usermap)
+        digest   (hashers/encrypt password)
+        newmap   (assoc usermap :password digest)]
+    (db/update-user-password!)
     newmap))
 
 (defn update-password! [usermap]
   (when-let [password (:password usermap)]
     (let [digest   (hashers/encrypt password)
           newmap   (assoc usermap :password digest)]
-      (update-user-password! newmap)
+      (db/update-user-password! newmap)
       newmap)))
 
 (s/def ::email h/email-spec)
@@ -69,25 +70,25 @@
   (log/info :create (dissoc user :password))
   (if-not (s/valid? :unq/user-create user)
     (create-form request (add-information user :unq/user-create [:username :password]))
-    (if (first (get-user user))
+    (if (first (db/get-user user))
       (create-form request (assoc user :errors true :already-exists true))
       (let [new-user (create-user! user)]
          (redirect (:index route-map))))))
       
 (defn index [request]
-  (let [users (get-users)]
+  (let [users (db/get-users)]
     (h/render request "templates/users/index.html" {:users users})))
 
 (defn show [request username]
   (log/info :show username)
   (when (s/valid? ::username username)
-    (let [user (first (get-user {:username username}))]
+    (let [user (first (db/get-user {:username username}))]
       (when user (h/render request "templates/users/show.html" user)))))
 
 (defn delete [username]
   (log/info :delete username)
   (when (s/valid? ::username username)
-    (let [_ (delete-user! {:username username})]
+    (let [_ (db/delete-user! {:username username})]
       (redirect (:index route-map)))))
 
 (defn edit-form [request user]
@@ -95,7 +96,7 @@
 
 (defn edit [request username]
   (log/info :edit username)
-  (let [user (first (get-user {:username username}))]
+  (let [user (first (db/get-user {:username username}))]
     (if user (edit-form request (dissoc user :password)))))  
 
 (defn update [request user]
@@ -104,7 +105,7 @@
     (if-not (s/valid? :unq/user-update to-validate)
       (edit-form request (add-information to-validate :unq/user-update []))
       (let [_ (update-password! to-validate)
-            _ (update-user-email! to-validate)]
+            _ (db/update-user-email! to-validate)]
            (redirect (:index route-map))))))          
 
 (defn user-routes []
