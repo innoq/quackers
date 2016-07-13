@@ -14,7 +14,8 @@
   ([request filename] (render request filename {}))
   ([request filename params]
    (let [redirect (request-url request)
-         p (assoc params :redirect-url redirect)]
+         p (assoc params :redirect-url redirect
+                         :auth (:identity request))]
      (render-file filename p))))
 
 (def email-regex #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")

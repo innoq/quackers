@@ -6,8 +6,9 @@
             [clojure-security-example.helpers :as h]
             [clojure-security-example.xss :refer [xss-routes]]
             [clojure-security-example.users :refer [user-routes]]
-            [clojure-security-example.authentication :refer [auth-routes]]
-            [clojure.tools.logging :as log]))
+            [clojure-security-example.authentication :refer [auth-routes auth-middleware]]
+            [clojure.tools.logging :as log]
+            [buddy.auth :refer [authenticated?]]))
 
 (defroutes index
   (GET "/" request (h/render request "templates/index.html")))  
@@ -36,7 +37,9 @@
 
 (defn logging-middleware [handler]
   (fn [request] 
-    (when (:identity request) (log/info :identity (:identity request)))
+    (if (:identity request) 
+      (log/info :identity (:identity request)) 
+      (log/info :unauthenticated))
     (let [response (handler request)]
       response)))
 
@@ -49,5 +52,6 @@
 (def app
   (-> (app-routes)
       ignore-trailing-slash
-     ; logging-middleware
+      logging-middleware
+      auth-middleware
       (wrap-defaults (middleware-settings)))) 

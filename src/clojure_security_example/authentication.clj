@@ -3,7 +3,7 @@
             [compojure.core :refer :all]
             [ring.util.response :refer [redirect]]
             [buddy.auth.protocols :as proto]
-            [buddy.sign.jws :as jws]
+            [buddy.sign.jwt :as jwt]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [clojure-security-example.helpers :as h]
             [clojure.spec :as s]
@@ -20,15 +20,15 @@
 (s/def :unq/user-login
   (s/keys :req-un [::username ::password]))
 
-(defn auth-backend [secret algorithm]
+(defn auth-backend [secret]
   (reify
     proto/IAuthentication
     (-parse [_ request]
-      (let [token (get-in request [:session :jwstoken])]
+      (let [token (get-in request [:session :jwttoken])]
         token))
     (-authenticate [_ _request data]
       (try
-        (jws/unsign data secret algorithm)
+        (jwt/unsign data secret)
         (catch clojure.lang.ExceptionInfo e nil)))
 
     proto/IAuthorization
@@ -37,12 +37,11 @@
         (h/permission-denied)
         (h/unauthorized)))))
 
-(defn auth-middleware []
-  (let [backend (auth-backend secret  {:alg :hs512})]
-    (fn [handler]
+(defn auth-middleware [handler]
+  (let [backend (auth-backend secret)]
       (-> handler
           (wrap-authentication backend)
-          (wrap-authorization backend)))))
+          (wrap-authorization backend))))
 
 (defn check-user [username password]
   (when-let [user (first (db/get-user {:username username}))]
@@ -52,12 +51,11 @@
 (defn do-login [request username password redirect-to]
   (if-let [user (check-user username password)]
     (let [exp (time/plus (time/now) (time/hours 3))
-          claims {:user (keyword username)}
-                 ;; :exp  exp}
-          _      (log/info :claims claims)
-          token  (jws/sign claims secret {:alg :hs512 :exp exp})
+          claims {:user username
+                  :exp  exp}
+          token  (jwt/sign claims secret)
           session (:session request)
-          updated-session (assoc session :jwstoken token)]
+          updated-session (assoc session :jwttoken token)]
       (-> (redirect redirect-to)
           (assoc :session updated-session)))
     (h/bad-request)))
