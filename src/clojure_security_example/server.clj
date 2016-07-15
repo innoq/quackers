@@ -5,10 +5,8 @@
             [clojure-security-example.helpers :as h]
             [clojure-security-example.handler :as handler]))
 
-(defn -main [& args]
-  (db/migrate)
-  (run-jetty
-    handler/app
+(defonce server 
+  (run-jetty #'handler/app 
     {:port (h/http-port)
      :join? false
      :ssl? true
@@ -16,3 +14,21 @@
      :keystore (:keystore env)
      :key-password (:key-password env)
      :host (h/host)}))
+
+(defn start! []
+  (.start server))
+
+(defn stop! []
+  (.stop server))
+
+(defn go! []
+  (start!))
+
+(defn reset! []
+  (stop!)
+  (go!))
+
+(defn -main [& args]
+  (db/migrate)
+  (start!))
+    
