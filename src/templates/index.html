@@ -1,6 +1,18 @@
 {% extends "templates/layout.html" %}
 {% block title %}Quackers{% endblock %}
 {% block content %}
+{% if auth %}
+<form method="post" action="/">
+	{% antiforgery %}
+	<input type="hidden" name="userid" value="{{auth.userid}}" />
+	<div class="input-group">
+		<input type="text" class="form-control" name="quack" />
+		<span class="input-group-btn">
+			<input type="submit" class="btn btn-default" value="Quack!" />
+		</span>
+	</div>
+</form>
+{% endif %}
 {% for quack in quacks %}
 <div class="panel panel-default">
 	<div class="panel-heading">{{quack.username}} {{quack.createdts|date:shortDate}}</div>

@@ -10,17 +10,12 @@
             [clojure-security-example.quacker :refer [quacker-routes]]
             [clojure.tools.logging :as log]
             [buddy.auth :refer [authenticated?]]))
-
-;;(defroutes index
-;;  (GET "/" request (h/render request "templates/index.html")))  
-               
+ 
 (defn app-routes []
   (routes
-    ;;index
     (auth-routes)
-    ;;(xss-routes "/xss")
     (quacker-routes)
-    (user-routes) ;; creates routes at /users endpoint
+    (user-routes)
     (route/not-found "Not Found!")))
 
 (defn ignore-trailing-slash
