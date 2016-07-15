@@ -7,17 +7,19 @@
             [clojure-security-example.xss :refer [xss-routes]]
             [clojure-security-example.users :refer [user-routes]]
             [clojure-security-example.authentication :refer [auth-routes auth-middleware]]
+            [clojure-security-example.quacker :refer [quacker-routes]]
             [clojure.tools.logging :as log]
             [buddy.auth :refer [authenticated?]]))
 
-(defroutes index
-  (GET "/" request (h/render request "templates/index.html")))  
+;;(defroutes index
+;;  (GET "/" request (h/render request "templates/index.html")))  
                
 (defn app-routes []
   (routes
-    index
+    ;;index
     (auth-routes)
-    (xss-routes "/xss")
+    ;;(xss-routes "/xss")
+    (quacker-routes)
     (user-routes) ;; creates routes at /users endpoint
     (route/not-found "Not Found!")))
 

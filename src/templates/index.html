@@ -1,6 +1,13 @@
 {% extends "templates/layout.html" %}
-{% block title %}Security Examples{% endblock %}
+{% block title %}Quackers{% endblock %}
 {% block content %}
-<a href="/xss">Show XSS</a>
-<a href="/users">Users</a>
+{% for quack in quacks %}
+<div class="panel panel-default">
+	<div class="panel-heading">{{quack.username}} {{quack.createdts|date:shortDate}}</div>
+	<div class="panel-body">
+		{{quack.quack}}
+	</div>
+</div>
+{% endfor %}
+<a href="/?limit={{limit}}&offset={% sum limit offset %}">Next</a>
 {% endblock %}
