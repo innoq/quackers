@@ -8,10 +8,10 @@ UPDATE Users SET Email = :email WHERE Username = :username ;
 UPDATE Users SET Password = :password WHERE Username = :username ;
 
 -- name: get-user
-SELECT Username,Email,Password FROM Users WHERE Username = :username ;
+SELECT Username,Email,Password,UserID FROM Users WHERE Username = :username ;
 
 -- name: get-users
-SELECT Username,Email,Password FROM Users ;
+SELECT Username,Email,Password,UserID FROM Users ;
 
 -- name: delete-user!
 DELETE FROM Users WHERE Username = :username ;

@@ -1,1 +1,1 @@
-CREATE TABLE Users (Username varchar(255), Email varchar(255), Password char(98), PRIMARY KEY (Username));
+CREATE TABLE Users (UserID int NOT NULL AUTO_INCREMENT, Username varchar(255), Email varchar(255), Password char(98), PRIMARY KEY (UserID));

@@ -52,6 +52,7 @@
   (if-let [user (check-user username password)]
     (let [exp (time/plus (time/now) (time/hours 3))
           claims {:user username
+                  :userid (:userid user)
                   :exp  exp}
           token  (jwt/sign claims secret)
           session (:session request)
