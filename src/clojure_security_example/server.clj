@@ -18,16 +18,6 @@
 (defn start! []
   (.start server))
 
-(defn stop! []
-  (.stop server))
-
-(defn go! []
-  (start!))
-
-(defn reset! []
-  (stop!)
-  (go!))
-
 (defn -main [& args]
   (db/migrate)
   (start!))
