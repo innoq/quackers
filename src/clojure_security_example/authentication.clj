@@ -60,7 +60,7 @@
       (-> (redirect redirect-to)
           (assoc :session updated-session)))
     (h/bad-request)))
-          
+
 (defn auth-routes []
   (routes
     (POST "/login" [username password redirect-to :as request] (do-login request username password redirect-to))))

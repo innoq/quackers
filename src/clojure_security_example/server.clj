@@ -5,8 +5,8 @@
             [clojure-security-example.helpers :as h]
             [clojure-security-example.handler :as handler]))
 
-(defonce server 
-  (run-jetty #'handler/app 
+(defonce server
+  (run-jetty #'handler/app
     {:port (h/http-port)
      :join? false
      :ssl? true
@@ -21,4 +21,3 @@
 (defn -main [& args]
   (db/migrate)
   (start!))
-    

@@ -1,4 +1,4 @@
-(ns clojure-security-example.helpers 
+(ns clojure-security-example.helpers
   (:require [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
             [ring.util.request :refer [request-url]]
             [selmer.parser :refer [render-file] :as selmer]
@@ -10,7 +10,7 @@
                  (fn [_ _]
                    (render-file "templates/anti-forgery.html" {:antiforgery *anti-forgery-token*})))
 
-(defn render 
+(defn render
   ([request filename] (render request filename {}))
   ([request filename params]
    (let [redirect (request-url request)

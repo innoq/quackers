@@ -9,5 +9,5 @@
 
 (defn xss-routes [path]
   (routes
-    (GET path request (h/render request "templates/xss.html")) 
+    (GET path request (h/render request "templates/xss.html"))
     (POST path [text :as request] (xss-attack request text))))

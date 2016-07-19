@@ -13,7 +13,7 @@
     {:index basepath
      :new   (str basepath "/new")
      :show  show
-     :edit  (str show "/edit")})) 
+     :edit  (str show "/edit")}))
 
 (defn create-user! [usermap]
   (let [password (:password usermap)
@@ -51,7 +51,7 @@
 (defn missing-key? [usermap keyword]
   (let [value (get usermap keyword)]
     (or (empty? value) (nil? value))))
-  
+
 (defn add-information [usermap validator required-keys]
   (let [data (s/explain-data validator usermap)
         _    (log/info :validation data)
@@ -62,7 +62,7 @@
         result (assoc (merge usermap invalid-map) :errors true)]
     (log/info :result result)
     result))
-    
+
 (defn create-form [request user]
   (h/render request "templates/users/create.html" user))
 
@@ -74,7 +74,7 @@
       (create-form request (assoc user :errors true :already-exists true))
       (let [new-user (create-user! user)]
          (redirect (:index route-map))))))
-      
+
 (defn index [request]
   (let [users (db/get-users)]
     (h/render request "templates/users/index.html" {:users users})))
@@ -97,7 +97,7 @@
 (defn edit [request username]
   (log/info :edit username)
   (let [user (first (db/get-user {:username username}))]
-    (if user (edit-form request (dissoc user :password)))))  
+    (if user (edit-form request (dissoc user :password)))))
 
 (defn update [request user]
   (log/info :update (dissoc user :password))
@@ -106,7 +106,7 @@
       (edit-form request (add-information to-validate :unq/user-update []))
       (let [_ (update-password! to-validate)
             _ (db/update-user-email! to-validate)]
-           (redirect (:index route-map))))))          
+           (redirect (:index route-map))))))
 
 (defn user-routes []
   (routes

@@ -10,7 +10,7 @@
             [clojure-security-example.quacker :refer [quacker-routes]]
             [clojure.tools.logging :as log]
             [buddy.auth :refer [authenticated?]]))
- 
+
 (defn app-routes []
   (routes
     (auth-routes)
@@ -33,9 +33,9 @@
                                      uri))))))
 
 (defn logging-middleware [handler]
-  (fn [request] 
-    (if (:identity request) 
-      (log/info :identity (:identity request)) 
+  (fn [request]
+    (if (:identity request)
+      (log/info :identity (:identity request))
       (log/info :unauthenticated))
     (let [response (handler request)]
       response)))
@@ -51,4 +51,4 @@
       ignore-trailing-slash
       logging-middleware
       auth-middleware
-      (wrap-defaults (middleware-settings)))) 
+      (wrap-defaults (middleware-settings))))

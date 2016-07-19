@@ -14,7 +14,7 @@
     (h/render request "templates/index.html" {:quacks quacks
                                               :limit  limit
                                               :offset offset})))
-                                              
+
 (defn do-quack [userid quack]
   (log/info :userid userid :quack quack)
   ;; TODO Validate
@@ -22,6 +22,6 @@
   (redirect "/"))
 
 (defn quacker-routes []
-  (routes 
+  (routes
     (GET "/" request (index request))
     (POST "/" [userid quack] (do-quack userid quack)))) ;; TODO AUTHORIZE!
