@@ -19,15 +19,16 @@
                                               :forward? (>= (count quacks) limit)})))
 
 (defn do-quack [quack identity]
-  ;; TODO Validate
   (when-let [{userid :userid} identity]
     (log/info :userid userid :quack quack :quackity-boo!)
-    (db/quack! {:userid userid :quack quack}))
-  (redirect "/"))
+    (db/quack! {:userid userid :quack quack})
+    (redirect "/")))
+
+(def quack-auth-rules [{:uri "/"
+                        :handler (fn [r] (some? (:identity r)))
+                        :request-method :post}])
 
 (defn quacker-routes []
   (routes
     (GET "/" request (index request))
-    (POST "/" [quack :as {identity :identity}]
-        (restrict (do-quack quack identity) {:handler (fn [r] (some? (:identity r)))
-                                             :on-error h/auth-error-handler}))))
+    (POST "/" [quack :as {identity :identity}] (do-quack quack identity))))

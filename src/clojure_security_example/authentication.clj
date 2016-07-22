@@ -12,6 +12,7 @@
             [clojure.tools.logging :as log]
             [buddy.auth.accessrules :refer [success error wrap-access-rules]]
             [clojure-security-example.users :refer [user-auth-rules]]
+            [clojure-security-example.quacker :refer [quack-auth-rules]]
             [clj-time.core :as time]))
 
 (def secret "myveryverysecretsecret")
@@ -36,7 +37,7 @@
 (defn auth-middleware [handler]
   (let [backend (auth-backend secret)]
       (-> handler
-          (wrap-access-rules {:rules user-auth-rules :on-error h/auth-error-handler})
+          (wrap-access-rules {:rules (concat quack-auth-rules user-auth-rules) :on-error h/auth-error-handler})
           (wrap-authentication backend)
           (wrap-authorization backend))))
 
