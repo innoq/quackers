@@ -8,6 +8,8 @@
             [ring.util.response :refer [redirect]]
             [clojure.spec :as s]))
 
+(defn ->int [s] (Integer/parseInt s))
+
 (selmer/add-tag! :antiforgery
                  (fn [_ _]
                    (render-file "templates/anti-forgery.html" {:antiforgery *anti-forgery-token*})))
@@ -26,10 +28,10 @@
 (def password-spec (s/and string? seq))
 
 (defn http-port []
-  (Integer/parseInt (or (env :http-port) "3000")))
+  (->int (or (env :http-port) "3000")))
 
 (defn ssl-port []
-  (Integer/parseInt (or (env :ssl-port) "4000")))
+  (->int (or (env :ssl-port) "4000")))
 
 (defn host []
   (or (env :host) "localhost"))

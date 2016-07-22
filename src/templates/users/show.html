@@ -1,10 +1,19 @@
 {% extends "templates/layout.html" %}
 {% block title %}Show User {{username}}{% endblock %}
 {% block content %}
-<dl>
-	<dt>Username:</dt>
-	<dd>{{username}}</dd>
-	<dt>Email:</dt>
-	<dd>{{email}}</dd>
-</dl>
+<h2>{{username}} ({{email}})</h2>
+	{% for quack in quacks %}
+	<div class="panel panel-default">
+		<div class="panel-heading"><a href="/users/{{quack.username}}">{{quack.username}}</a> {{quack.createdts|date:shortDate}}</div>
+		<div class="panel-body">
+			{{quack.quack}}
+		</div>
+	</div>
+	{% endfor %}
+	{% if back >= 0 %}
+		<a href="/users/{{username}}?limit={{limit}}&offset={{back}}">Previous</a>
+	{% endif %}
+	{% if forward? %}
+	  <a href="/users/{{username}}?limit={{limit}}&offset={% sum limit offset %}">Next</a>
+	{% endif %}
 {% endblock %}

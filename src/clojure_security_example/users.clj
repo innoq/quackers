@@ -1,6 +1,6 @@
 (ns clojure-security-example.users
   (:require [compojure.core :refer :all]
-            [clojure-security-example.helpers :as h]
+            [clojure-security-example.helpers :refer [->int] :as h]
             [clojure.tools.logging :as log]
             [clojure-security-example.database :as db]
             [ring.util.response :refer [redirect]]
@@ -83,7 +83,14 @@
   (log/info :show username)
   (when (s/valid? ::username username)
     (let [user (first (db/get-user {:username username}))]
-      (when user (h/render request "templates/users/show.html" user)))))
+      (when user
+        (let [limit   (->int (get-in request [:query-params "limit"] "10"))
+              offset  (->int (get-in request [:query-params "offset"] "0"))
+              quacks  (db/get-quacks-for-user {:limit limit :offset offset
+                                               :username username})]
+            (h/render request "templates/users/show.html"
+                      (assoc user :quacks quacks :limit limit :offset offset
+                                  :back (- offset limit) :forward? (>= (count quacks) limit))))))))
 
 (defn delete [username]
   (log/info :delete username)

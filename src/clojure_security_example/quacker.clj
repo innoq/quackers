@@ -1,12 +1,11 @@
 (ns clojure-security-example.quacker
-  (:require [clojure-security-example.helpers :as h]
+  (:require [clojure-security-example.helpers :refer [->int] :as h]
             [clojure-security-example.database :as db]
             [clojure.tools.logging :as log]
             [ring.util.response :refer [redirect]]
             [compojure.core :refer [routes GET POST]]
             [buddy.auth.accessrules :refer [restrict]]))
 
-(defn ->int [s] (Integer/parseInt s))
 
 (defn index [request]
   (let [limit (->int (get-in request [:query-params "limit"] "10"))
