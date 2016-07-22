@@ -3,7 +3,8 @@
             [clojure-security-example.database :as db]
             [clojure.tools.logging :as log]
             [ring.util.response :refer [redirect]]
-            [compojure.core :refer [routes GET POST]]))
+            [compojure.core :refer [routes GET POST]]
+            [buddy.auth.accessrules :refer [restrict]]))
 
 (defn ->int [s] (Integer/parseInt s))
 
@@ -27,4 +28,6 @@
 (defn quacker-routes []
   (routes
     (GET "/" request (index request))
-    (POST "/" [quack :as {identity :identity}] (do-quack quack identity)))) ;; TODO AUTHORIZE!
+    (POST "/" [quack :as {identity :identity}]
+        (restrict (do-quack quack identity) {:handler (fn [r] (some? (:identity r)))
+                                             :on-error h/auth-error-handler}))))

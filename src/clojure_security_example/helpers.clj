@@ -4,6 +4,8 @@
             [selmer.parser :refer [render-file] :as selmer]
             [clojure.tools.logging :as log]
             [environ.core :refer [env]]
+            [clojure.string :refer [starts-with?]]
+            [ring.util.response :refer [redirect]]
             [clojure.spec :as s]))
 
 (selmer/add-tag! :antiforgery
@@ -34,6 +36,18 @@
 
 (defn site-url []
   (str "https://" (host) ":" (ssl-port)))
+
+(defn get-redirect [url]
+  (let [index-page (site-url)]
+    (if url
+      (if (starts-with? url index-page) url index-page)
+      index-page)))
+
+(defn redirect-to-login [redirect-url]
+  (redirect (str "/login?redirect-to=" (get-redirect redirect-url))))
+
+(defn auth-error-handler [request _v]
+  (redirect-to-login (request-url request)))
 
 (defn bad-request [] {:status 400 :headers {} :body "Bad Request"})
 (defn unauthorized [] {:status 401 :headers {} :body "Unauthorized"})
