@@ -14,9 +14,10 @@
                  [environ "1.0.3"]
                  [yesql "0.5.3"]
                  [buddy "1.0.0"]
-                 [com.h2database/h2 "1.4.192"]]
+                 [com.h2database/h2 "1.4.192"]
+                 [org.clojure/tools.namespace "0.2.11"]
+                 [org.danielsz/system "0.3.0"]]
   :plugins [[lein-environ "1.0.3"]]
-  :main clojure-security-example.server
+  :main clojure-security-example.core
   :aliases {"migrate" ["run" "-m" "db.migrate/migrate"]
             "rollback" ["run" "-m" "db.migrate/rollback"]})
-       
