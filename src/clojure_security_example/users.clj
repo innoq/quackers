@@ -108,6 +108,23 @@
             _ (db/update-user-email! to-validate)]
            (redirect (:index route-map))))))
 
+(defn is-user? [request]
+   (when-let [{user :user} (:identity request)]
+     (let [{{username :username} :match-params} request]
+       (log/info :user user :username username)
+       (= user username))))
+
+(def user-auth-rules [{:uri (:index route-map)
+                       :handler (fn [r] (:identity r))}
+                      {:uri (:edit route-map)
+                       :handler is-user?}
+                      {:uri (:show route-map)
+                       :handler is-user?
+                       :request-method :delete}
+                      {:uri (:show route-map)
+                       :handler is-user?
+                       :request-method :put}])
+
 (defn user-routes []
   (routes
     (GET    (:index route-map) request (index request))

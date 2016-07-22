@@ -10,6 +10,8 @@
             [clojure-security-example.database :as db]
             [buddy.hashers :as hashers]
             [clojure.tools.logging :as log]
+            [buddy.auth.accessrules :refer [success error wrap-access-rules]]
+            [clojure-security-example.users :refer [user-auth-rules]]
             [clj-time.core :as time]))
 
 (def secret "myveryverysecretsecret")
@@ -40,6 +42,7 @@
 (defn auth-middleware [handler]
   (let [backend (auth-backend secret)]
       (-> handler
+          (wrap-access-rules {:rules user-auth-rules :on-error (fn [r v] (redirect "/"))})
           (wrap-authentication backend)
           (wrap-authorization backend))))
 
