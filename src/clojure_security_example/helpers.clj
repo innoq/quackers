@@ -13,15 +13,15 @@
 (defn render
   ([request filename] (render request filename {}))
   ([request filename params]
-   (let [redirect (request-url request)
+   (let [redirect (get params :redirect (request-url request))
          p (assoc params :redirect-url redirect
                          :auth (:identity request))]
      (render-file filename p))))
 
 (def email-regex #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")
 (def email-spec (s/and string? (s/or :valid? #(re-matches email-regex %) :empty? empty?)))
-(def username-spec (s/and string? #(not (empty? %))))
-(def password-spec (s/and string? #(not (empty? %))))
+(def username-spec (s/and string? seq))
+(def password-spec (s/and string? seq))
 
 (defn http-port []
   (Integer/parseInt (or (env :http-port) "3000")))
@@ -31,6 +31,9 @@
 
 (defn host []
   (or (env :host) "localhost"))
+
+(defn site-url []
+  (str "https://" (host) ":" (ssl-port)))
 
 (defn bad-request [] {:status 400 :headers {} :body "Bad Request"})
 (defn unauthorized [] {:status 401 :headers {} :body "Unauthorized"})

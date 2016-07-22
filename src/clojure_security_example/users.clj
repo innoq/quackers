@@ -115,7 +115,8 @@
        (= user username))))
 
 (def user-auth-rules [{:uri (:index route-map)
-                       :handler (fn [r] (:identity r))}
+                       :handler (fn [r] (some? (:identity r)))
+                       :request-method :get}
                       {:uri (:edit route-map)
                        :handler is-user?}
                       {:uri (:show route-map)

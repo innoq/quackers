@@ -1,18 +1,34 @@
-{% extends "templates/layout.html" %}
-{% block title %}Login{% endblock %}
-{% block content %}
-<p>Please log in!</p>
-<form method="post" action="/login">
-	{% antiforgery %}
-	<fieldset class="form-group {% if username-invalid %}has-error{% endif %}">
-		<label for="username">Username:</label>
-		<input type="text" class="form-control" id="username" name="username" value="{{username}}"/>
-	</fieldset>
-	<fieldset class="form-group {% if password-invalid %}has-error{% endif %}">
-		<label for="password">Password:</label>
-		<input type="password" class="form-control" id="password" name="password" value="{{password}}" />
-	</fieldset>
-	<input type="hidden" name="redirect-to" value="{{redirect-url}}" />
-	<input type="submit" class="form-control" />
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Login to Quackers</title>
+	{% style "/css/bootstrap.min.css" %}
+	{% style "/css/style.css" %}
+</head>
+<body>
+	<nav class="navbar navbar-default navbar-static-top">
+		<div class="container">
+			<div class="navbar-header">
+				<a href="/users/new" class="navbar-brand">Create Account</a>
+			</div>
+		</div>
+	</nav>
+	<div class="container">
+		<p>Please log in!</p>
+		<form method="post" action="/login">
+			{% antiforgery %}
+			<fieldset class="form-group {% if username-invalid %}has-error{% endif %}">
+				<label for="username">Username:</label>
+				<input type="text" class="form-control" id="username" name="username" value="{{username}}"/>
+			</fieldset>
+			<fieldset class="form-group {% if password-invalid %}has-error{% endif %}">
+				<label for="password">Password:</label>
+				<input type="password" class="form-control" id="password" name="password" value="{{password}}" />
+			</fieldset>
+			<input type="hidden" name="redirect-to" value="{{redirect-url}}" />
+			<input type="submit" class="form-control" />
+		</form>
+	</div>
+</body>
+</html>

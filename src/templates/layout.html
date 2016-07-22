@@ -11,16 +11,19 @@
 		<div class="container">
 			<div class="navbar-header">
 				{% if auth %}
-				<a href="/users" class="navbar-brand">Users<a/>
+				<a href="/users" class="navbar-brand">Users</a>
 				{% else %}
 				<a href="/users/new" class="navbar-brand">Create Account</a>
 				{% endif %}
 			</div>
 			 <div class="navbar-header pull-right">
 			 	{% if auth %}
-			 	<a class="navbar-brand" href="/users/{{auth.user}}">
-				Hello! {{auth.user}}
-			 	</a>
+				<div class="navbar-brand">
+					<a href="/users/{{auth.user}}">
+					Hello! {{auth.user}}
+					</a>
+					(<a href="/logout?redirect-to={{redirect-url}}">Logout</a>)
+				</div>
 			 	{% else %}
 			 	<form class="navbar-form" method="post" action="/login">
 			 	 {% antiforgery %}
