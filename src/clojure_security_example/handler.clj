@@ -4,7 +4,6 @@
             [ring.middleware.defaults :refer [wrap-defaults secure-site-defaults]]
             [ring.middleware.session.cookie :refer [cookie-store]]
             [clojure-security-example.helpers :as h]
-            [clojure-security-example.xss :refer [xss-routes]]
             [clojure-security-example.users :refer [user-routes]]
             [clojure-security-example.authentication :refer [auth-routes auth-middleware]]
             [clojure-security-example.quacker :refer [quacker-routes]]
@@ -43,8 +42,7 @@
 (defn middleware-settings []
   (-> secure-site-defaults
     ;  (assoc-in [:session :store] (cookie-store {:key "I'm a 16-bit key"}))
-      (assoc-in [:security :ssl-redirect] {:ssl-port (h/ssl-port)}) ;; for non-standard ssl-port
-      (assoc-in [:security :xss-protection :enable?] false))) ;; normally do not change. For this app, we want to show what XSS looks like, so we need to 'enable' it.
+      (assoc-in [:security :ssl-redirect] {:ssl-port (h/ssl-port)}))) ;; for non-standard ssl-port
 
 (def app
   (-> (app-routes)
