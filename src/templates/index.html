@@ -2,9 +2,9 @@
 {% block title %}Quackers{% endblock %}
 {% block content %}
 {% if auth %}
-<form method="post" action="/">
+<form class="quack-field" method="post" action="/">
 	{% antiforgery %}
-	<input type="hidden" name="userid" value="{{auth.userid}}" />
+	<!-- <input type="hidden" name="userid" value="{{auth.userid}}" /> -->
 	<div class="input-group">
 		<input type="text" class="form-control" name="quack" />
 		<span class="input-group-btn">
@@ -15,11 +15,16 @@
 {% endif %}
 {% for quack in quacks %}
 <div class="panel panel-default">
-	<div class="panel-heading">{{quack.username}} {{quack.createdts|date:shortDate}}</div>
+	<div class="panel-heading"><a href="/users/{{quack.username}}">{{quack.username}}</a> {{quack.createdts|date:shortDate}}</div>
 	<div class="panel-body">
 		{{quack.quack}}
 	</div>
 </div>
 {% endfor %}
-<a href="/?limit={{limit}}&offset={% sum limit offset %}">Next</a>
+{% if back >= 0 %}
+	<a href="/?limit={{limit}}&offset={{back}}">Previous</a>
+{% endif %}
+{% if forward? %}
+  <a href="/?limit={{limit}}&offset={% sum limit offset %}">Next</a>
+{% endif %}
 {% endblock %}

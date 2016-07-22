@@ -4,10 +4,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>{% block title %}Title{% endblock %}</title>
 	{% style "/css/bootstrap.min.css" %}
+	{% style "/css/style.css" %}
 </head>
 <body>
 	<nav class="navbar navbar-default navbar-static-top">
 		<div class="container">
+			<div class="navbar-header">
+				{% if auth %}
+				<a href="/users" class="navbar-brand">Users<a/>
+				{% else %}
+				<a href="/users/new" class="navbar-brand">Create Account</a>
+				{% endif %}
+			</div>
 			 <div class="navbar-header pull-right">
 			 	{% if auth %}
 			 	<a class="navbar-brand" href="/users/{{auth.user}}">

@@ -13,15 +13,18 @@
         quacks (db/get-quacks {:limit limit :offset offset})]
     (h/render request "templates/index.html" {:quacks quacks
                                               :limit  limit
-                                              :offset offset})))
+                                              :offset offset
+                                              :back  (- offset limit)
+                                              :forward? (>= (count quacks) limit)})))
 
-(defn do-quack [userid quack]
-  (log/info :userid userid :quack quack)
+(defn do-quack [quack identity]
   ;; TODO Validate
-  (db/quack! {:userid (->int userid) :quack quack})
+  (when-let [{userid :userid} identity]
+    (log/info :userid userid :quack quack :quackity-boo!)
+    (db/quack! {:userid userid :quack quack}))
   (redirect "/"))
 
 (defn quacker-routes []
   (routes
     (GET "/" request (index request))
-    (POST "/" [userid quack] (do-quack userid quack)))) ;; TODO AUTHORIZE!
+    (POST "/" [quack :as {identity :identity}] (do-quack quack identity)))) ;; TODO AUTHORIZE!
