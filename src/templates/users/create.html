@@ -6,24 +6,30 @@
 	<span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
 	<span class="sr-only">Error:</span>
 	Make sure your input fields are correct!
-	{% if already-exists %}
-	The username '{{username}}' is already taken!
-	{% endif %}
 </div>
 {% endif %}
 <form method="post" action="/users">
 	{% antiforgery %}
-	<fieldset class="form-group {% if username-invalid %}has-error{% endif %}">
+	<fieldset class="form-group {% if errors.username %}has-error{% endif %}">
 		<label for="username">Username:</label>
 		<input type="text" class="form-control" id="username" name="username" value="{{username}}"/>
+		{% if errors.username %}
+		<span class="help-block">{{errors.username|first}}</span>
+		{% endif %}
 	</fieldset>
-	<fieldset class="form-group {% if email-invalid %}has-error{% endif %}">
+	<fieldset class="form-group {% if errors.email %}has-error{% endif %}">
 		<label for="email">Email:</label>
 		<input type="text" class="form-control" id="email" name="email" value="{{email}}" />
+		{% if errors.email %}
+		<span class="help-block">{{errors.email|first}}</span>
+		{% endif %}
 	</fieldset>
-	<fieldset class="form-group {% if password-invalid %}has-error{% endif %}">
+	<fieldset class="form-group {% if errors.password %}has-error{% endif %}">
 		<label for="password">Password:</label>
 		<input type="password" class="form-control" id="password" name="password" value="{{password}}" />
+		{% if errors.password %}
+		<span class="help-block">{{errors.password|first}}</span>
+		{% endif %}
 	</fieldset>
 	<input type="submit" class="form-control" />
 </form>

@@ -4,7 +4,8 @@
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
   :min-lein-version "2.0.0"
-  :dependencies [[org.clojure/clojure "1.9.0-alpha9"]
+  :dependencies [[org.clojure/clojure "1.8.0"]
+                 [bouncer "1.0.0"]
                  [compojure "1.5.1"]
                  [ring/ring-defaults "0.2.1"]
                  [ring/ring-jetty-adapter "1.5.0"]

@@ -4,7 +4,8 @@
             [clojure.tools.logging :as log]
             [quackers.database :as db]
             [ring.util.response :refer [redirect]]
-            [clojure.spec :as s]
+            [bouncer.core :as b]
+            [bouncer.validators :as v]
             [buddy.hashers :as hashers]))
 
 (def route-map
@@ -36,44 +37,33 @@
       (db/update-user-password! newmap)
       newmap)))
 
-(s/def ::email h/email-spec)
-(s/def ::username h/username-spec)
-(s/def ::password h/password-spec)
+(defn valid-username? [username]
+  (b/valid? {:username username} :username [v/required v/string]))
 
-(s/def :unq/user-create
-  (s/keys :req-un [::username ::password]
-          :opt-un [::email]))
+(defn validate-user-create [usermap]
+  (b/validate usermap 
+    :username [v/required v/string]
+    :email    [v/string [v/matches h/email-regex :message "invalid email"]]
+    :password [v/required v/string]))
 
-(s/def :unq/user-update
-  (s/keys :req-un [::username]
-          :opt-un [::email ::password]))
-
-(defn missing-key? [usermap keyword]
-  (let [value (get usermap keyword)]
-    (or (empty? value) (nil? value))))
-
-(defn add-information [usermap validator required-keys]
-  (let [data (s/explain-data validator usermap)
-        _    (log/info :validation data)
-        invalid (mapcat :in (second (first data)) data)
-        missing (filter (partial missing-key? usermap) required-keys)
-        all  (distinct (concat invalid missing))
-        invalid-map (into {} (map (fn [k] [(keyword (str (name k) "-invalid")) true]) all))
-        result (assoc (merge usermap invalid-map) :errors true)]
-    (log/info :result result)
-    result))
+(defn validate-user-update [usermap]
+  (b/validate usermap
+    :username [v/required v/string]
+    :email    [v/string [v/matches h/email-regex :message "invalid email"]]
+    :password v/string))
 
 (defn create-form [request user]
   (h/render request "templates/users/create.html" user))
 
 (defn create-user [request user]
   (log/info :create (dissoc user :password))
-  (if-not (s/valid? :unq/user-create user)
-    (create-form request (add-information user :unq/user-create [:username :password]))
-    (if (first (db/get-user user))
-      (create-form request (assoc user :errors true :already-exists true))
-      (let [new-user (create-user! user)]
-         (redirect (:index route-map))))))
+  (let [[errors validated] (validate-user-create user)]
+    (if errors
+      (create-form request (assoc user :errors errors))
+      (if (first (db/get-user user))
+        (create-form request (assoc user :errors {:username ["already exists"]}))
+        (let [new-user (create-user! user)]
+          (redirect (:index route-map)))))))
 
 (defn index [request]
   (let [users (db/get-users)]
@@ -81,7 +71,7 @@
 
 (defn show [request username]
   (log/info :show username)
-  (when (s/valid? ::username username)
+  (when (valid-username? username)
     (let [user (first (db/get-user {:username username}))]
       (when user
         (let [limit   (->int (get-in request [:query-params "limit"] "10"))
@@ -94,7 +84,7 @@
 
 (defn delete [username]
   (log/info :delete username)
-  (when (s/valid? ::username username)
+  (when (valid-username? username)
     (let [_ (db/delete-user! {:username username})]
       (redirect (:index route-map)))))
 
@@ -103,17 +93,19 @@
 
 (defn edit [request username]
   (log/info :edit username)
-  (let [user (first (db/get-user {:username username}))]
-    (if user (edit-form request (dissoc user :password)))))
+  (when (valid-username? username)
+    (let [user (first (db/get-user {:username username}))]
+      (if user (edit-form request (dissoc user :password))))))
 
 (defn update [request user]
   (log/info :update (dissoc user :password))
   (let [to-validate (if (empty? (:password user)) (dissoc user :password) user)]
-    (if-not (s/valid? :unq/user-update to-validate)
-      (edit-form request (add-information to-validate :unq/user-update []))
-      (let [_ (update-password! to-validate)
-            _ (db/update-user-email! to-validate)]
-           (redirect (:index route-map))))))
+    (let [[errors validated] (validate-user-update to-validate)]
+      (if errors
+        (edit-form request (assoc to-validate :errors errors))
+        (let [_ (update-password! to-validate)
+              _ (db/update-user-email! to-validate)]
+             (redirect (:index route-map)))))))
 
 (defn is-user? [request]
    (when-let [{user :user} (:identity request)]

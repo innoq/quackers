@@ -6,7 +6,6 @@
             [buddy.sign.jwt :as jwt]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [quackers.helpers :as h]
-            [clojure.spec :as s]
             [quackers.database :as db]
             [buddy.hashers :as hashers]
             [clojure.tools.logging :as log]

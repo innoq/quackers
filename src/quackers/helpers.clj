@@ -5,8 +5,7 @@
             [clojure.tools.logging :as log]
             [environ.core :refer [env]]
             [clojure.string :refer [starts-with?]]
-            [ring.util.response :refer [redirect]]
-            [clojure.spec :as s]))
+            [ring.util.response :refer [redirect]]))
 
 (defn ->int [s] (Integer/parseInt s))
 
@@ -22,10 +21,7 @@
                          :auth (:identity request))]
      (render-file filename p))))
 
-(def email-regex #"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")
-(def email-spec (s/and string? (s/or :valid? #(re-matches email-regex %) :empty? empty?)))
-(def username-spec (s/and string? seq))
-(def password-spec (s/and string? seq))
+(def email-regex #"^$|^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,63}$")
 
 (defn http-port []
   (->int (or (env :http-port) "3000")))
