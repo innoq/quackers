@@ -1,6 +1,6 @@
 (defproject quackers "0.1.0-SNAPSHOT"
   :description "Examples of common security attacks (e.g. XSS)"
-  :url "http://gitlab.innoq.com/innoq/clojure-security-example"
+  :url "https://github.com/innoq/quackers"
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
   :min-lein-version "2.0.0"
