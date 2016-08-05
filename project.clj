@@ -12,7 +12,7 @@
                  [selmer "1.0.7"]
                  [org.clojure/tools.logging "0.3.1"]
                  [ragtime "0.6.1"]
-                 [environ "1.0.3"]
+                 [environ "1.1.0"]
                  [yesql "0.5.3"]
                  [buddy "1.0.0"]
                  [com.h2database/h2 "1.4.192"]
