@@ -1,4 +1,4 @@
-(defproject clojure-security-example "0.1.0-SNAPSHOT"
+(defproject quackers "0.1.0-SNAPSHOT"
   :description "Examples of common security attacks (e.g. XSS)"
   :url "http://gitlab.innoq.com/innoq/clojure-security-example"
   :license {:name "Apache License, Version 2.0"
@@ -18,6 +18,6 @@
                  [org.clojure/tools.namespace "0.2.11"]
                  [org.danielsz/system "0.3.0"]]
   :plugins [[lein-environ "1.0.3"]]
-  :main clojure-security-example.core
+  :main quackers.core
   :aliases {"migrate" ["run" "-m" "db.migrate/migrate"]
             "rollback" ["run" "-m" "db.migrate/rollback"]})

@@ -1,4 +1,4 @@
-(ns clojure-security-example.database
+(ns quackers.database
   (:require [environ.core :refer [env]]
             [yesql.core :refer [defqueries]]))
 

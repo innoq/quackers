@@ -1,18 +1,18 @@
-(ns clojure-security-example.authentication
+(ns quackers.authentication
   (:require [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [compojure.core :refer :all]
             [ring.util.response :refer [redirect]]
             [buddy.auth.protocols :as proto]
             [buddy.sign.jwt :as jwt]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
-            [clojure-security-example.helpers :as h]
+            [quackers.helpers :as h]
             [clojure.spec :as s]
-            [clojure-security-example.database :as db]
+            [quackers.database :as db]
             [buddy.hashers :as hashers]
             [clojure.tools.logging :as log]
             [buddy.auth.accessrules :refer [success error wrap-access-rules]]
-            [clojure-security-example.users :refer [user-auth-rules]]
-            [clojure-security-example.quacker :refer [quack-auth-rules]]
+            [quackers.users :refer [user-auth-rules]]
+            [quackers.quacker :refer [quack-auth-rules]]
             [clj-time.core :as time]))
 
 (def secret "myveryverysecretsecret")

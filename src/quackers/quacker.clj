@@ -1,6 +1,6 @@
-(ns clojure-security-example.quacker
-  (:require [clojure-security-example.helpers :refer [->int] :as h]
-            [clojure-security-example.database :as db]
+(ns quackers.quacker
+  (:require [quackers.helpers :refer [->int] :as h]
+            [quackers.database :as db]
             [clojure.tools.logging :as log]
             [ring.util.response :refer [redirect]]
             [compojure.core :refer [routes GET POST]]

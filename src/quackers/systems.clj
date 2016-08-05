@@ -1,10 +1,10 @@
-(ns clojure-security-example.systems
+(ns quackers.systems
   (:require [system.core :refer [defsystem]]
-            [clojure-security-example.helpers :as h]
+            [quackers.helpers :as h]
             (system.components
               [jetty :refer [new-web-server]])
             [environ.core :refer [env]]
-            [clojure-security-example.handler :as handler]))
+            [quackers.handler :as handler]))
 
 (def options
   {:port (h/http-port)

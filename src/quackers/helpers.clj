@@ -1,4 +1,4 @@
-(ns clojure-security-example.helpers
+(ns quackers.helpers
   (:require [ring.middleware.anti-forgery :refer [*anti-forgery-token*]]
             [ring.util.request :refer [request-url]]
             [selmer.parser :refer [render-file] :as selmer]

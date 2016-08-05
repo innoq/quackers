@@ -1,12 +1,12 @@
-(ns clojure-security-example.handler
+(ns quackers.handler
   (:require [compojure.core :refer :all]
             [compojure.route :as route]
             [ring.middleware.defaults :refer [wrap-defaults secure-site-defaults]]
             [ring.middleware.session.cookie :refer [cookie-store]]
-            [clojure-security-example.helpers :as h]
-            [clojure-security-example.users :refer [user-routes]]
-            [clojure-security-example.authentication :refer [auth-routes auth-middleware]]
-            [clojure-security-example.quacker :refer [quacker-routes]]
+            [quackers.helpers :as h]
+            [quackers.users :refer [user-routes]]
+            [quackers.authentication :refer [auth-routes auth-middleware]]
+            [quackers.quacker :refer [quacker-routes]]
             [clojure.tools.logging :as log]
             [buddy.auth :refer [authenticated?]]))
 

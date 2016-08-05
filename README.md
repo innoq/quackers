@@ -1,7 +1,9 @@
-# clojure-security-example
+# quackers
 
-An example application demonstrating security weaknesses and offering 
-solutions on how to fix them.
+A twitter clone for ducks written in Clojure.
+
+This application is intended to illustrate the different security libraries 
+which are available in the Clojure universe. 
 
 ## Prerequisites
 

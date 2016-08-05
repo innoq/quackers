@@ -1,8 +1,8 @@
-(ns clojure-security-example.users
+(ns quackers.users
   (:require [compojure.core :refer :all]
-            [clojure-security-example.helpers :refer [->int] :as h]
+            [quackers.helpers :refer [->int] :as h]
             [clojure.tools.logging :as log]
-            [clojure-security-example.database :as db]
+            [quackers.database :as db]
             [ring.util.response :refer [redirect]]
             [clojure.spec :as s]
             [buddy.hashers :as hashers]))
