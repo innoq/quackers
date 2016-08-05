@@ -41,7 +41,7 @@
 
 (defn middleware-settings []
   (-> secure-site-defaults
-    ;  (assoc-in [:session :store] (cookie-store {:key "I'm a 16-bit key"}))
+      (assoc-in [:session :store] (cookie-store {:key "I'm a 16-bit key"}))
       (assoc-in [:security :ssl-redirect] {:ssl-port (h/ssl-port)}))) ;; for non-standard ssl-port
 
 (def app
