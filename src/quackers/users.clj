@@ -6,6 +6,7 @@
             [ring.util.response :refer [redirect]]
             [bouncer.core :as b]
             [bouncer.validators :as v]
+            [buddy.auth :refer [authenticated?]]
             [buddy.hashers :as hashers]))
 
 (def route-map
@@ -109,21 +110,16 @@
 
 (defn is-user? [request]
    (when-let [{user :user} (:identity request)]
-     (let [{{username :username} :match-params} request]
-       (log/info :user user :username username)
-       (= user username))))
+     (= user (get-in request [:match-params :username]))))
 
 (def user-auth-rules [{:uri (:index route-map)
-                       :handler (fn [r] (some? (:identity r)))
+                       :handler authenticated?
                        :request-method :get}
                       {:uri (:edit route-map)
                        :handler is-user?}
                       {:uri (:show route-map)
                        :handler is-user?
-                       :request-method :delete}
-                      {:uri (:show route-map)
-                       :handler is-user?
-                       :request-method :put}])
+                       :request-method #{:put :delete :post}}])
 
 (defn user-routes []
   (routes
