@@ -1,5 +1,5 @@
 (ns quackers.authentication
-  (:require [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
+  (:require [buddy.auth.middleware :refer [wrap-authentication]]
             [compojure.core :refer :all]
             [ring.util.response :refer [redirect]]
             [buddy.auth.protocols :as proto]
@@ -37,8 +37,7 @@
   (let [backend (auth-backend secret)]
       (-> handler
           (wrap-access-rules {:rules (concat quack-auth-rules user-auth-rules) :on-error h/auth-error-handler})
-          (wrap-authentication backend)
-          (wrap-authorization backend))))
+          (wrap-authentication backend))))
 
 (defn check-user [username password]
   (when (and (string? username) (seq username))
