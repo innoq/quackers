@@ -5,6 +5,8 @@ A twitter clone for ducks written in Clojure.
 This application is intended to illustrate the different security libraries 
 which are available in the Clojure universe. 
 
+***This is still WIP***
+
 ## Prerequisites
 
 You will need [Leiningen][] 2.0.0 or above installed.
