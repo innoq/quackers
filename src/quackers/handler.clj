@@ -33,20 +33,18 @@
 
 (defn logging-middleware [handler]
   (fn [request]
-    (if (:identity request)
-      (log/info :identity (:identity request))
-      (log/info :unauthenticated))
     (let [response (handler request)]
       response)))
 
 (defn middleware-settings []
   (-> secure-site-defaults
       (assoc-in [:session :store] (cookie-store {:key "I'm a 16-bit key"}))
-      (assoc-in [:security :ssl-redirect] {:ssl-port (h/ssl-port)}))) ;; for non-standard ssl-port
+      (assoc-in [:security :ssl-redirect] {:ssl-port (h/ssl-port)})))
+      ;;(assoc-in [:security :hsts] false))) ;; for non-standard ssl-port
 
 (def app
   (-> (app-routes)
       ignore-trailing-slash
-      logging-middleware
+      ;;logging-middleware
       auth-middleware
       (wrap-defaults (middleware-settings))))

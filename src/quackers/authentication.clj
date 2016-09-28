@@ -4,6 +4,7 @@
             [ring.util.response :refer [redirect]]
             [buddy.auth.protocols :as proto]
             [buddy.sign.jwt :as jwt]
+            [buddy.auth.backends :as backends]
             [buddy.auth :refer [authenticated? throw-unauthorized]]
             [quackers.helpers :as h]
             [quackers.database :as db]
@@ -16,28 +17,19 @@
 
 (def secret "myveryverysecretsecret")
 
-(defn auth-backend [secret]
-  (reify
-    proto/IAuthentication
-    (-parse [_ request]
-      (let [token (get-in request [:session :jwttoken])]
-        token))
-    (-authenticate [_ _request data]
-      (try
-        (jwt/unsign data secret)
-        (catch clojure.lang.ExceptionInfo e nil)))
-
-    proto/IAuthorization
-    (-handle-unauthorized [_ request _metadata]
-      (if (authenticated? request)
-        (h/permission-denied)
-        (h/unauthorized)))))
+(defn set-auth-header [handler]
+  (fn [request]
+    (let [token (get-in request [:session :jwttoken])
+          token-string (str "Token " token)
+          new-request (assoc-in request [:headers "authorization"] token-string)]
+      (handler new-request))))
 
 (defn auth-middleware [handler]
-  (let [backend (auth-backend secret)]
+  (let [backend (backends/jws {:secret secret})]
       (-> handler
           (wrap-access-rules {:rules (concat quack-auth-rules user-auth-rules) :on-error h/auth-error-handler})
-          (wrap-authentication backend))))
+          (wrap-authentication backend)
+          set-auth-header)))
 
 (defn check-user [username password]
   (when (and (string? username) (seq username))
